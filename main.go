@@ -20,7 +20,12 @@ func main() {
 	app := cli.NewApp()
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name: "file, f",
+			Name:  "file, f",
+			Usage: "Specify to generate TOC.",
+		},
+		cli.BoolFlag{
+			Name:  "in-file, i",
+			Usage: "Insert TOC to md file specified --file option.",
 		},
 	}
 
@@ -38,40 +43,57 @@ func main() {
 func action(c *cli.Context) error {
 	input, err := ioutil.ReadFile(c.String("file"))
 	if err != nil {
-		fmt.Println("failed to read file")
-		os.Exit(1)
+		return err
 	}
 
 	toc := generateTOC(input)
 
-	outputWithTOC(string(input), toc)
+	output, err := generateWithTOC(string(input), toc)
+	if err != nil {
+		return err
+	}
+
+	if c.Bool("in-file") {
+		f, err := os.OpenFile(c.String("file"), os.O_WRONLY, os.ModeAppend)
+		defer f.Close()
+		if err != nil {
+			return err
+		}
+
+		_, err = f.Write([]byte(output))
+		if err != nil {
+			return err
+		}
+	} else {
+		fmt.Printf(output)
+	}
 	return nil
 }
 
-func outputWithTOC(input string, toc string) error {
+func generateWithTOC(input string, toc string) (string, error) {
 	tocPos := strings.Index(input, TOC_POS)
 	if tocPos == -1 {
-		return errors.New(fmt.Sprintf("Can not find toc_pos comment `%s`", TOC_POS))
+		return "", errors.New(fmt.Sprintf("Can not find toc_pos comment `%s`", TOC_POS))
 	}
 	tocStartPos := strings.Index(string(input), TOC_START_POS)
 	if tocStartPos != -1 {
 		tocEndPos := strings.Index(string(input), TOC_END_POS)
 		if tocEndPos == -1 {
-			return errors.New(fmt.Sprintf("Can not find toc end position comment `%s`.", TOC_END_POS))
+			return "", errors.New(fmt.Sprintf("Can not find toc end position comment `%s`.", TOC_END_POS))
 		}
 
 		spos := tocPos + 12
 		epos := tocEndPos + 16
 		output := input[:spos] + "\n" + TOC_START_POS + "\n" + toc + "\n" + TOC_END_POS + input[epos:]
-		fmt.Printf(output)
+		return output, nil
 	} else {
 
 		spos := tocPos + 12
 		epos := tocPos + 12
 		output := input[:spos] + "\n" + TOC_START_POS + "\n" + toc + "\n" + TOC_END_POS + input[epos:]
-		fmt.Printf(output)
+		return output, nil
 	}
-	return nil
+	return "", nil
 }
 
 func generateTOC(input []byte) string {
