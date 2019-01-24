@@ -4,7 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/russross/blackfriday"
+	"github.com/urfave/cli"
 	"io/ioutil"
+
+	"log"
 	"os"
 	"strings"
 )
@@ -14,7 +17,26 @@ const TOC_START_POS = "<!-- toc:start -->"
 const TOC_END_POS = "<!-- toc:end -->"
 
 func main() {
-	input, err := ioutil.ReadFile("./test.md")
+	app := cli.NewApp()
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name: "file, f",
+		},
+	}
+
+	app.Action = func(c *cli.Context) error {
+		return action(c)
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func action(c *cli.Context) error {
+	input, err := ioutil.ReadFile(c.String("file"))
 	if err != nil {
 		fmt.Println("failed to read file")
 		os.Exit(1)
@@ -23,6 +45,7 @@ func main() {
 	toc := generateTOC(input)
 
 	outputWithTOC(string(input), toc)
+	return nil
 }
 
 func outputWithTOC(input string, toc string) error {
