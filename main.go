@@ -16,6 +16,12 @@ const TOC_POS = "<!-- toc -->"
 const TOC_START_POS = "<!-- toc:start -->"
 const TOC_END_POS = "<!-- toc:end -->"
 
+type MDToc struct {
+	File   string
+	InFile bool
+	Level  int
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Version = "0.0.1"
@@ -46,14 +52,16 @@ func main() {
 }
 
 func action(c *cli.Context) error {
-	input, err := ioutil.ReadFile(c.String("file"))
+	mdtoc := MDToc{File: c.String("file"), InFile: c.Bool("in-file"), Level: c.Int("level")}
+
+	input, err := ioutil.ReadFile(mdtoc.File)
 	if err != nil {
 		return err
 	}
 
-	toc := generateTOC(input)
+	toc := mdtoc.generateTOC(input)
 
-	output, err := generateWithTOC(string(input), toc)
+	output, err := mdtoc.generateWithTOC(string(input), toc)
 	if err != nil {
 		return err
 	}
@@ -75,7 +83,7 @@ func action(c *cli.Context) error {
 	return nil
 }
 
-func generateWithTOC(input string, toc string) (string, error) {
+func (mdtoc *MDToc) generateWithTOC(input string, toc string) (string, error) {
 	tocPos := strings.Index(input, TOC_POS)
 	if tocPos == -1 {
 		return "", errors.New(fmt.Sprintf("Can not find toc_pos comment `%s`", TOC_POS))
@@ -101,12 +109,12 @@ func generateWithTOC(input string, toc string) (string, error) {
 	return "", nil
 }
 
-func generateTOC(input []byte) string {
+func (mdtoc *MDToc) generateTOC(input []byte) string {
 	parser := blackfriday.New()
 	toc := ""
 	node := parser.Parse(input)
 	node.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		if node.Type == blackfriday.Heading  && node.Level > 1 && node.Level < 3 {
+		if node.Type == blackfriday.Heading && node.Level > 1 && node.Level < mdtoc.Level {
 			anchor := string(node.FirstChild.Literal)
 			anchor = strings.Replace(anchor, " ", "", -1)
 			anchor = strings.Replace(anchor, ".", "", -1)
