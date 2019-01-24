@@ -36,7 +36,7 @@ func main() {
 		},
 		cli.IntFlag{
 			Name:  "level, l",
-			Value: 3,
+			Value: 2,
 		},
 	}
 
@@ -114,7 +114,7 @@ func (mdtoc *MDToc) generateTOC(input []byte) string {
 	toc := ""
 	node := parser.Parse(input)
 	node.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		if node.Type == blackfriday.Heading && node.Level > 1 && node.Level < mdtoc.Level {
+		if node.Type == blackfriday.Heading && node.Level > 1 && node.Level <= mdtoc.Level {
 			anchor := string(node.FirstChild.Literal)
 			anchor = strings.Replace(anchor, " ", "", -1)
 			anchor = strings.Replace(anchor, ".", "", -1)
