@@ -1,10 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/russross/blackfriday"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 )
@@ -18,33 +18,33 @@ func main() {
 
 	toc := generateTOC(input)
 
-	tocPos := strings.Index(string(input), "<!-- toc -->")
+	outputWithTOC(string(input), toc)
+}
+
+func outputWithTOC(input string, toc string) error {
+	tocPos := strings.Index(input, "<!-- toc -->")
 	if tocPos == -1 {
-		log.Printf("[ERROR] can not find toc_pos comment `<!-- toc -->`.")
-		os.Exit(1)
+		return errors.New("Can not find toc_pos comment `<!-- toc -->`.")
 	}
 	tocStartPos := strings.Index(string(input), "<!-- toc:start -->")
 	if tocStartPos != -1 {
 		tocEndPos := strings.Index(string(input), "<!-- toc:end -->")
 		if tocEndPos == -1 {
-			log.Printf("[ERROR] can not find toc end position comment `<!-- toc:end -->`.")
-			os.Exit(1)
+			return errors.New("Can not find toc end position comment `<!-- toc:end -->`.")
 		}
 
-		s := string(input)
 		spos := tocPos + 12
 		epos := tocEndPos + 16
-		output := s[:spos] + "\n<!--toc:start -->\n" + toc + "\n<!-- toc:end -->" + s[epos:]
+		output := input[:spos] + "\n<!--toc:start -->\n" + toc + "\n<!-- toc:end -->" + input[epos:]
 		fmt.Println(output)
 	} else {
 
-		pos := tocPos + 12
-		s := string(input)
-		output := s[:pos] + "\n<!-- toc:start -->\n" + toc + "\n<!-- toc:end -->\n" + s[pos:]
+		spos := tocPos + 12
+		epos := tocPos + 12
+		output := input[:spos] + "\n<!-- toc:start -->\n" + toc + "\n<!-- toc:end -->\n" + input[epos:]
 		fmt.Println(output)
-
 	}
-
+	return nil
 }
 
 func generateTOC(input []byte) string {
