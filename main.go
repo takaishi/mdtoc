@@ -18,6 +18,7 @@ const TOC_END_POS = "<!-- toc:end -->"
 
 func main() {
 	app := cli.NewApp()
+	app.Version = "0.0.1"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "file, f",
@@ -26,6 +27,10 @@ func main() {
 		cli.BoolFlag{
 			Name:  "in-file, i",
 			Usage: "Insert TOC to md file specified --file option.",
+		},
+		cli.IntFlag{
+			Name:  "level, l",
+			Value: 3,
 		},
 	}
 
@@ -84,13 +89,13 @@ func generateWithTOC(input string, toc string) (string, error) {
 
 		spos := tocPos + 12
 		epos := tocEndPos + 16
-		output := input[:spos] + "\n" + TOC_START_POS + "\n" + toc + "\n" + TOC_END_POS + input[epos:]
+		output := input[:spos] + "\n" + TOC_START_POS + "\n" + toc + "\n\n" + TOC_END_POS + input[epos:]
 		return output, nil
 	} else {
 
 		spos := tocPos + 12
 		epos := tocPos + 12
-		output := input[:spos] + "\n" + TOC_START_POS + "\n" + toc + "\n" + TOC_END_POS + input[epos:]
+		output := input[:spos] + "\n" + TOC_START_POS + "\n" + toc + "\n\n" + TOC_END_POS + input[epos:]
 		return output, nil
 	}
 	return "", nil
@@ -101,12 +106,13 @@ func generateTOC(input []byte) string {
 	toc := ""
 	node := parser.Parse(input)
 	node.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		if node.Type == blackfriday.Heading {
+		if node.Type == blackfriday.Heading && node.Level < 3 {
 			anchor := string(node.FirstChild.Literal)
 			anchor = strings.Replace(anchor, " ", "", -1)
 			anchor = strings.Replace(anchor, ".", "", -1)
+			anchor = strings.ToLower(anchor)
 
-			toc = fmt.Sprintf("%s\n%s [%s](%s)", toc, strings.Repeat("*", node.Level), node.FirstChild.Literal, anchor)
+			toc = fmt.Sprintf("%s\n%s* [%s](#%s)", toc, strings.Repeat(" ", (node.Level-1)*2), node.FirstChild.Literal, anchor)
 
 			if node.Next != nil {
 				*node = *node.Next
