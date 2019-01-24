@@ -59,7 +59,7 @@ func action(c *cli.Context) error {
 	}
 
 	if c.Bool("in-file") {
-		f, err := os.OpenFile(c.String("file"), os.O_WRONLY, os.ModeAppend)
+		f, err := os.OpenFile(c.String("file"), os.O_WRONLY|os.O_TRUNC, os.ModeAppend)
 		defer f.Close()
 		if err != nil {
 			return err
