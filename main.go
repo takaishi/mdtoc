@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+const TOC_POS = "<!-- toc -->"
+const TOC_START_POS = "<!-- toc:start -->"
+const TOC_END_POS = "<!-- toc:end -->"
+
 func main() {
 	input, err := ioutil.ReadFile("./test.md")
 	if err != nil {
@@ -22,27 +26,27 @@ func main() {
 }
 
 func outputWithTOC(input string, toc string) error {
-	tocPos := strings.Index(input, "<!-- toc -->")
+	tocPos := strings.Index(input, TOC_POS)
 	if tocPos == -1 {
-		return errors.New("Can not find toc_pos comment `<!-- toc -->`.")
+		return errors.New(fmt.Sprintf("Can not find toc_pos comment `%s`", TOC_POS))
 	}
-	tocStartPos := strings.Index(string(input), "<!-- toc:start -->")
+	tocStartPos := strings.Index(string(input), TOC_START_POS)
 	if tocStartPos != -1 {
-		tocEndPos := strings.Index(string(input), "<!-- toc:end -->")
+		tocEndPos := strings.Index(string(input), TOC_END_POS)
 		if tocEndPos == -1 {
-			return errors.New("Can not find toc end position comment `<!-- toc:end -->`.")
+			return errors.New(fmt.Sprintf("Can not find toc end position comment `%s`.", TOC_END_POS))
 		}
 
 		spos := tocPos + 12
 		epos := tocEndPos + 16
-		output := input[:spos] + "\n<!--toc:start -->\n" + toc + "\n<!-- toc:end -->" + input[epos:]
-		fmt.Println(output)
+		output := input[:spos] + "\n" + TOC_START_POS + "\n" + toc + "\n" + TOC_END_POS + input[epos:]
+		fmt.Printf(output)
 	} else {
 
 		spos := tocPos + 12
 		epos := tocPos + 12
-		output := input[:spos] + "\n<!-- toc:start -->\n" + toc + "\n<!-- toc:end -->\n" + input[epos:]
-		fmt.Println(output)
+		output := input[:spos] + "\n" + TOC_START_POS + "\n" + toc + "\n" + TOC_END_POS + input[epos:]
+		fmt.Printf(output)
 	}
 	return nil
 }
