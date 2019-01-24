@@ -106,7 +106,7 @@ func generateTOC(input []byte) string {
 	toc := ""
 	node := parser.Parse(input)
 	node.Walk(func(node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		if node.Type == blackfriday.Heading && node.Level < 3 {
+		if node.Type == blackfriday.Heading  && node.Level > 1 && node.Level < 3 {
 			anchor := string(node.FirstChild.Literal)
 			anchor = strings.Replace(anchor, " ", "", -1)
 			anchor = strings.Replace(anchor, ".", "", -1)
