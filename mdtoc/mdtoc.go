@@ -17,7 +17,7 @@ type MDToc struct {
 	Level  int
 }
 
-func (mdtoc *MDToc) GenerateWithTOC(input string, toc string) (string, error) {
+func (mdtoc *MDToc) InsertTOC(input string, toc string) (string, error) {
 	tocPos := strings.Index(input, TOC_POS)
 	if tocPos == -1 {
 		return "", errors.New(fmt.Sprintf("Can not find toc_pos comment `%s`", TOC_POS))

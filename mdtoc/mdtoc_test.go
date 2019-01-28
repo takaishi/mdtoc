@@ -31,7 +31,7 @@ func TestGenerateTOC(t *testing.T) {
 	}
 }
 
-func TestGenerateWithTOC(t *testing.T) {
+func TestInsertTOC(t *testing.T) {
 	mt := MDToc{File: "", InFile: false, Level: 2}
 
 	toc := mt.GenerateTOC([]byte(inputTextValid))
@@ -44,7 +44,7 @@ func TestGenerateWithTOC(t *testing.T) {
 		t.Error(expect)
 	}
 
-	output, err := mt.GenerateWithTOC(inputTextValid, toc)
+	output, err := mt.InsertTOC(inputTextValid, toc)
 	if err != nil {
 		t.Error(err)
 	}

@@ -49,7 +49,7 @@ func action(c *cli.Context) error {
 
 	toc := mdtoc.GenerateTOC(input)
 
-	output, err := mdtoc.GenerateWithTOC(string(input), toc)
+	output, err := mdtoc.InsertTOC(string(input), toc)
 	if err != nil {
 		return err
 	}
