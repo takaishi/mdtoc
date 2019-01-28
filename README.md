@@ -28,7 +28,13 @@ GLOBAL OPTIONS:
    --version, -v            print the version
 ```
 
-## example
+## Install
+
+```
+$ brew install takaishi/fomulas/patt
+```
+
+## Example
 
 ```md
 $ cat example.md
