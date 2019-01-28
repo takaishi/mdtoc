@@ -9,6 +9,8 @@ before:
 builds:
 - env:
   - CGO_ENABLED=0
+  ldflags:
+    -X github.com/takaishi/mdtoc/config.Version={{.Version}}
 archive:
   replacements:
     darwin: Darwin
