@@ -17,15 +17,16 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "file, f",
-			Usage: "Specify to generate TOC.",
+			Usage: "Specify to generate table of contents.",
 		},
 		cli.BoolFlag{
 			Name:  "in-file, i",
-			Usage: "Insert TOC to md file specified --file option.",
+			Usage: "Insert table of contents to md file specified --file option.",
 		},
 		cli.IntFlag{
 			Name:  "level, l",
 			Value: 2,
+			Usage: "Specify the level of the header to insert as the table of contents.",
 		},
 	}
 
