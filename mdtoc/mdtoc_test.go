@@ -4,7 +4,8 @@ import (
 	"testing"
 )
 
-var inputTextValid = `# This is example
+var inputTextValid = `
+# This is example
 
 <!-- toc -->
 
@@ -17,7 +18,22 @@ aaa
 bbb
 `
 
-var inputTextInvalid1 = `# This is example
+var expectTOC = `
+  * [foo](#foo)
+  * [bar](#bar)
+`
+
+var outputTextValid = `
+# This is example
+
+<!-- toc -->
+<!-- toc:start -->
+
+  * [foo](#foo)
+  * [bar](#bar)
+
+
+<!-- toc:end -->
 
 ## foo
 
@@ -28,7 +44,20 @@ aaa
 bbb
 `
 
-var inputTextInvalid2 = `# This is example
+var inputTextInvalidWithoutTOCComment = `
+# This is example
+
+## foo
+
+aaa
+
+## bar
+
+bbb
+`
+
+var inputTextInvalidWithoutTOCEndComment = `
+# This is example
 
 <!-- toc -->
 <!-- toc:start -->
@@ -50,13 +79,10 @@ func TestGenerateTOC(t *testing.T) {
 	mt := MDToc{File: "", InFile: false, Level: 2}
 
 	toc := mt.GenerateTOC([]byte(inputTextValid))
-	expect := `
-  * [foo](#foo)
-  * [bar](#bar)`
 
-	if toc != expect {
+	if toc != expectTOC {
 		t.Error(toc)
-		t.Error(expect)
+		t.Error(expectTOC)
 	}
 }
 
@@ -64,42 +90,21 @@ func TestInsertTOC(t *testing.T) {
 	mt := MDToc{File: "", InFile: false, Level: 2}
 
 	toc := mt.GenerateTOC([]byte(inputTextValid))
-	expect := `
-  * [foo](#foo)
-  * [bar](#bar)`
 
-	if toc != expect {
+	if toc != expectTOC {
 		t.Error(toc)
-		t.Error(expect)
+		t.Error(expectTOC)
 	}
 
 	output, err := mt.InsertTOC(inputTextValid, toc)
 	if err != nil {
 		t.Error(err)
 	}
-	expect = `# This is example
 
-<!-- toc -->
-<!-- toc:start -->
-
-  * [foo](#foo)
-  * [bar](#bar)
-
-<!-- toc:end -->
-
-## foo
-
-aaa
-
-## bar
-
-bbb
-`
-
-	if output != expect {
+	if output != outputTextValid {
 		t.Error("unmatch")
 		t.Error(output)
-		t.Error(expect)
+		t.Error(expectTOC)
 	}
 }
 
@@ -107,22 +112,12 @@ func TestInsertTOCWithInvalidString(t *testing.T) {
 	mt := MDToc{File: "", InFile: false, Level: 2}
 
 	toc := mt.GenerateTOC([]byte(inputTextValid))
-	expect := `
-  * [foo](#foo)
-  * [bar](#bar)`
-
-	if toc != expect {
-		t.Error(toc)
-		t.Error(expect)
-	}
-
-	_, err := mt.InsertTOC(inputTextInvalid1, toc)
-
+	_, err := mt.InsertTOC(inputTextInvalidWithoutTOCComment, toc)
 	if err.Error() != "Can not find toc_pos comment `<!-- toc -->`" {
 		t.Error()
 	}
 
-	_, err = mt.InsertTOC(inputTextInvalid2, toc)
+	_, err = mt.InsertTOC(inputTextInvalidWithoutTOCEndComment, toc)
 
 	if err.Error() != "Can not find toc end position comment `<!-- toc:end -->`." {
 		t.Error()

@@ -64,5 +64,6 @@ func (mdtoc *MDToc) GenerateTOC(input []byte) string {
 		}
 		return blackfriday.GoToNext
 	})
+	toc = fmt.Sprintf("%s\n", toc)
 	return toc
 }
