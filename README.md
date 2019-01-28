@@ -1,5 +1,7 @@
 # mdtoc
 
+[![Build Status](https://travis-ci.org/takaishi/mdtoc.svg?branch=master)](https://travis-ci.org/takaishi/mdtoc)
+
 Generatr and insert table of content with markdown.
 
 ## Usage
