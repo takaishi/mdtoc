@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/takaishi/mdtoc/config"
 	"github.com/takaishi/mdtoc/mdtoc"
 	"github.com/urfave/cli"
 	"io/ioutil"
@@ -12,7 +13,7 @@ import (
 
 func main() {
 	app := cli.NewApp()
-	app.Version = "0.0.1"
+	app.Version = config.Version
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "file, f",
