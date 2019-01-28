@@ -25,3 +25,16 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
+brew:
+  github:
+    owner: takaishi
+    name: homebrew-fomulas
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+  description: "CLI tool to Generate and insert markdown's table of contents"
+  homepage: "https://github.com/takaishi/mdtoc"
+  install: |
+    bin.install Dir['mdtoc']
+  test: |
+    system "#{bin}/mdtoc"
