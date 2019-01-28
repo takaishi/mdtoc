@@ -31,7 +31,7 @@ GLOBAL OPTIONS:
 ## Install
 
 ```
-$ brew install takaishi/fomulas/patt
+$ brew install takaishi/fomulas/mdtoc
 ```
 
 ## Example
